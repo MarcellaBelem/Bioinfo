@@ -37,7 +37,14 @@ porcentagem0=  round(prop.table(tabela0) * 100, 2)
 pie(porcentagem0, labels = paste(names(porcentagem0), "(", porcentagem0, "%)", sep = ""), col= rainbow(length(levels(rs.DI_patho$Clinical.Significance))), cex= 0.8)
 pie(porcentagem0, labels = paste(names(porcentagem0), "(", porcentagem0, "%)", sep = ""), col= rainbow(length(levels(rs.DI_patho$phenotypes))), cex= 0.8)
 #ver no ggplot
+tabelavari= data.frame(xtabs(~Clinical.Significance+phenotypes, rs))
 
+ ggplot(tabela0, x= "", y= phenotypes, fil= Clinical.Significance)
+ geom_bar(stat = "identity", width = 1) +
+   coord_polar("y", start = 0) +
+   geom_text(aes(label = paste0(round(percentagem), "%")), position = position_stack(vjust = 0.5)) +
+   theme_void() +
+   labs(title = "Gráfico de Pizza com Porcentagens")
 
 #2 por phenotype
 rs.DI_patho <- factor(rs.DI_patho$phenotypes, levels = c("Intellectual Disability", "Mental retardation")
@@ -147,4 +154,3 @@ freq_total= merge(freqq2, freq8, by= "Variation.ID", all= FALSE)
 freq_total1= freq_total[,c(1, 2,4,6,8,10,12,14,16)]
 
 hist()
-                      
