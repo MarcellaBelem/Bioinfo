@@ -1,0 +1,65 @@
+Variation ID	Chromosome	Position	Variation	Type	Clinical Significance	Phenotypes
+rs200087574	chr5	88722588	G/C	single nucleotide variant	Benign/Likely benign	not specified,Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations
+rs1194300256	chr5	88722641	A/G	single nucleotide variant	Uncertain significance	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations
+rs1244083930	chr5	88722646	G/A	single nucleotide variant	Likely benign	not provided
+rs376439815	chr5	88722694	G/A	single nucleotide variant	Conflicting interpretations of pathogenicity	not specified,not provided
+rs745534524	chr5	88722736	C/G	single nucleotide variant	Likely benign	not provided
+rs768570497	chr5	88722779	G/A	single nucleotide variant	Uncertain significance	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations
+rs753002290	chr5	88722819	T/C	single nucleotide variant	Uncertain significance	not specified,not provided
+rs1064797057	chr5	88722825	G/A	single nucleotide variant	Likely pathogenic	not provided
+rs1057521169	chr5	88728507	G/T	single nucleotide variant	Likely benign	not specified
+rs970307256	chr5	88728540	T/C	single nucleotide variant	Likely benign	not provided
+rs796052727	chr5	88728564	G/C	single nucleotide variant	Uncertain significance	not provided
+rs797045703	chr5	88728572	C/T	single nucleotide variant	Likely benign	not specified
+rs796052726	chr5	88728613	C/G	single nucleotide variant	Uncertain significance	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations,not specified,not provided
+rs1064796969	chr5	88729241	G/C	single nucleotide variant	Uncertain significance	not provided
+rs747980554	chr5	88729311	A/G	single nucleotide variant	Likely benign	not specified
+rs185655344	chr5	88729321	C/T	single nucleotide variant	Conflicting interpretations of pathogenicity	not specified,Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations,not provided
+rs777826971	chr5	88729322	G/A	single nucleotide variant	Uncertain significance	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations
+rs777826971	chr5	88729322	G/T	single nucleotide variant	Likely pathogenic	not provided
+rs760064638	chr5	88730195	C/T	single nucleotide variant	Likely benign	not specified
+rs140447603	chr5	88730196	G/A	single nucleotide variant	Benign	not specified
+rs1282449699	chr5	88730223	G/A	single nucleotide variant	Likely benign	not provided
+rs149706617	chr5	88730246	C/T	single nucleotide variant	Benign/Likely benign	not specified
+rs201988423	chr5	88730247	G/A	single nucleotide variant	Benign	not specified
+rs587783748	chr5	88731719	T/A	single nucleotide variant	Likely benign	not specified
+rs776117674	chr5	88731759	T/C	single nucleotide variant	Likely benign	History of neurodevelopmental disorder,not specified
+rs368575766	chr5	88731780	T/C	single nucleotide variant	Conflicting interpretations of pathogenicity	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations,not provided
+rs752349182	chr5	88731809	T/C	single nucleotide variant	Uncertain significance	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations,not provided
+rs79455305	chr5	88731897	G/A	single nucleotide variant	Benign/Likely benign	not specified,Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations,not provided
+rs776496777	chr5	88749092	C/T	single nucleotide variant	Likely benign	not specified,not provided
+rs997965581	chr5	88749098	G/A	single nucleotide variant	Uncertain significance	not provided
+rs3729703	chr5	88751800	T/G	single nucleotide variant	Likely benign	not provided
+rs1370610061	chr5	88751851	A/T	single nucleotide variant	Uncertain significance	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations
+rs398123686	chr5	88751861	G/A	single nucleotide variant	Conflicting interpretations of pathogenicity	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations,not specified,not provided
+rs1250885583	chr5	88751902	T/C	single nucleotide variant	Uncertain significance	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations
+rs371858773	chr5	88751915	C/T	single nucleotide variant	Uncertain significance	not specified
+rs1057521189	chr5	88751919	G/T	single nucleotide variant	Likely benign	not specified
+rs781632867	chr5	88751957	T/C	single nucleotide variant	Conflicting interpretations of pathogenicity	not provided
+rs200518765	chr5	88751966	A/G	single nucleotide variant	Likely benign	Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations
+rs1366038563	chr5	88752006	A/C	single nucleotide variant	Uncertain significance	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations
+rs774945849	chr5	88752023	G/A	single nucleotide variant	Likely benign	not provided
+rs569860731	chr5	88761081	G/A	single nucleotide variant	Likely benign	not specified
+rs997329230	chr5	88761110	C/A	single nucleotide variant	Likely benign	not specified
+rs759365719	chr5	88761167	G/A	single nucleotide variant	Likely benign	not specified
+rs1345329569	chr5	88761190	A/G	single nucleotide variant	Likely benign	not provided
+rs186648089	chr5	88761224	G/A	single nucleotide variant	Conflicting interpretations of pathogenicity	not specified,Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations,not provided
+rs760986750	chr5	88761269	G/A	single nucleotide variant	Likely benign	not provided
+rs587781034	chr5	88761275	G/A	single nucleotide variant	Benign/Likely benign	not specified,not provided
+rs755436703	chr5	88761279	G/A	single nucleotide variant	Uncertain significance	not provided
+rs777529202	chr5	88761326	C/T	single nucleotide variant	Likely benign	not specified,not provided
+rs563149132	chr5	88804588	G/A	single nucleotide variant	Conflicting interpretations of pathogenicity	not specified,Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations
+rs372739987	chr5	88804591	C/G	single nucleotide variant	Likely benign	not specified,not provided
+rs780952466	chr5	88804604	G/A	single nucleotide variant	Likely benign	not provided
+rs779924552	chr5	88804631	C/A	single nucleotide variant	Likely benign	not specified
+rs773278207	chr5	88804676	G/A	single nucleotide variant	Benign/Likely benign	History of neurodevelopmental disorder,not specified,not provided
+rs776920242	chr5	88804724	C/T	single nucleotide variant	Likely benign	not specified
+rs1323101986	chr5	88804727	A/G	single nucleotide variant	Likely benign	not specified
+rs143129901	chr5	88804748	G/A	single nucleotide variant	Likely benign	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations
+rs1057522729	chr5	88804784	C/T	single nucleotide variant	Likely benign	not specified
+rs545185248	chr5	88823787	A/G	single nucleotide variant	Pathogenic	Mental retardation, stereotypic movements, epilepsy, and/or cerebral malformations,not provided
+rs1199121348	chr5	88823789	A/G	single nucleotide variant	Uncertain significance	not provided
+rs753574675	chr5	88823805	C/G	single nucleotide variant	Uncertain significance	Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations
+rs565142555	chr5	88823807	C/T	single nucleotide variant	Likely benign	Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations
+rs371238107	chr5	88823830	A/G	single nucleotide variant	Conflicting interpretations of pathogenicity	not specified,Intellectual Disability, Stereotypic Movements, Epilepsy, and/or Cerebral Malformations
+rs978491338	chr5	88823831	T/A	single nucleotide variant	Likely benign	not specified
