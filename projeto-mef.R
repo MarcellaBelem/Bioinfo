@@ -110,21 +110,6 @@ ancestralidade= ancestralidade %>% rename( Variante= Variation.ID, AFR = AFR.Fre
   mutate(Doença = if_else(Phenotypes == "Intellectual Disability", as.factor("YES"), as.factor("NO")))
 ancestralidade$freq_predominante= apply(ancestralidade[,-1], 1, function(x)names(x)[which.max(x)])
 
-library(tidyr) # Para a função gather()
-#nao
-# Convertendo o data frame para o formato longo (tidy)
-variantes_populacao_long <- gather(ancestralidade, key = "População", value = "Frequência", -Variante)
-
-# gráfico de barras agrupadas
-ggplot(variantes_populacao_long, aes(x = Variante, y = Frequência, fill = População)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  labs(fill = "Population",title = "Distribuição de Frequência por População",
-       x = "Variants", y = "Frequencies") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 35, hjust = 1))  # Rotacionando os rótulos do eixo x para melhor legibilidade
-#nao usar
-rm(variantes_populacao_long)
-
 #só comas as 5 variantes
 ancestralidadeDI=  novo_rs2[, c(1,5:12, 14,15)] 
 ancestralidadeDI= merge(ancestralidadeDI, snps_communs, by= "Variation.ID", all=FALSE)
@@ -290,70 +275,6 @@ ggplot(dados_longos, aes(x = Populacao, y = Frequencia, fill = Populacao)) +
        y = "Frequency") +
   theme_minimal()
 
-##regressão: analisar a relação entre as frequências das variantes em diferentes populações e algum resultado binário, como a presença ou ausência de uma doença
-dado=as.data.frame(t(ancestralidade[,(1:9)]))
-colnames(dado) <- as.character(unlist(dado[1, ]))                     
-dado= dado[-1,]
-
-dado$população= c("AFR", "AMR", "ASJ", "EAS", "FIN", "NFE", "OTH", "SAS" )
-dado <- data.frame(dado, row.names = NULL)
-dado <- dado[, c("população", names(dado)[-which(names(dado) == "população")])]
-
-write.table(dado, "populaçao_frequenciasbyvariantes.txt", sep = "\t", quote = FALSE)
-dados2= read.delim("populaçao_frequenciasbyvariantes.txt", sep = "\t")
-
-############3
-#regressçao logistica binomial
-library(dplyr)
-table(ancestralidade$Clinical_snp)
-summary(ancestralidade)
-glimpse(dadosAFR)
-levels(ancestralidade$Doença)
-dadosAFR= ancestralidade [, c(1,2,10,12)]
-modAFR= glm(Doença ~AFR+ clinical_snp, data= dadosAFR,
-            family = binomial(link = "logit"))
-plot(modAFR)
-
-
-#PCA; visualizar a estrutura genética das populações com base nas frequências das variantes.
-library(readr)
-snp_data= ancestralidadeDI[,c(1:9)]
-snp_data[,2:8]= apply(dados_test[,2:8], 2, as.numeric)
-snp_data <- snp_data %>%
-  rowwise() %>%
-  mutate(Population_Predominant = colnames(snp_data[,-1])[which.max(c_across(c("AFR", "AMR", "ASJ", "NFE")))])
-
-#matriz de frequências
-freq_matrix <- as.matrix(snp_data[ , 2:8])
-
-pca_result <- prcomp(freq_matrix, scale = FALSE)
-
-pca_coords <- as.data.frame(pca_result$x)
-
-#add um cluster
-kmeans_result <- kmeans(pca_coords[, c("PC1", "PC2")], centers = length(unique(pca_coords$Population_Predominant)))
-
-# Adicionar os SNPs às coordenadas
-pca_coords$SNP <- snp_data$Variante
-pca_coords$Population_Predominant <- snp_data$Population_Predominant
-pca_coords$Cluster <- factor(kmeans_result$cluster)
-
-# Plotar O PCA
-ggplot(pca_coords, aes(x = PC1, y = PC2, label = SNP)) +
-  geom_point(aes(color=Cluster, size=2 )) +
-  geom_text(aes(label = SNP), hjust = 1.5, vjust = 1.5) +
-  theme_minimal() +
-  labs(title = "PCA dos SNPs", x = "Componente Principal 1", y = "Componente Principal 2")+
-  scale_color_brewer(palette = "Set1")
-
-freq_scale= scale(freq_matrix)
-
-corr_matrix <- cor(freq_scale)
-ggcorrplot(corr_matrix,hc.order = TRUE, type = "lower",
-           lab = TRUE)
-
-install.packages("ggcorrplot")
-library(ggcorrplot)
 
 #fst
 install.packages("hierfstat")
