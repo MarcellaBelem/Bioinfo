@@ -1,12 +1,12 @@
 library(tidyverse)
 library(ggplot2)
-library(dbplyr)
+library(dplyr)
 library(tidyverse)
 #bancos de dados utilizados: SNP-nexus, tabelas do clinvar, gnomad
 
 clinvar= read.delim2("clinvar.txt", sep = "\t")
 
-gnomad= read.delim2("gnomad.txt", sep = "\t")
+gnomad= read.table("gnomad.txt", sep = "/t")
 
 sift= read.delim2("sift.txt", sep= "\t")
 
@@ -18,13 +18,17 @@ rm()
 rs= merge(gnomad, clinvar, by= "Variation.ID", all= F)
 rs$phenotypes= NA
 write.table(rs, "Variantes_MEF2C.txt", sep = "\t", col.names = T, quote = FALSE)
-rss= read.table("Variantes_MEF2C.txt", sep = "\t")
+rs= read.table("Variantes_MEF2C.txt", sep = "\t", stringsAsFactors = TRUE)
+
 
 #1filtro: por phenotypo: DI
 rs.DI= rs[grep("Mental retardation|Intellectual Disability", rs$Phenotypes),c(1:15,19:22)]
 
 #2filtro por patogenicidade: patogenico, incerto e provavelmente patogenico
 rs.DI_patho= rs.DI[grep("Pathogenic|Likely pathogenic|Uncertain significance", rs.DI$Clinical.Significance),]
+
+
+write.table(rs.DI_patho, "Variantes_MEF2C_DI.txt", sep= "\t", col.names = T, quote = FALSE)
 
 
 #grafico representado os achados
@@ -52,7 +56,7 @@ rs$Clinical.Significance <- factor(rs$Clinical.Significance, levels = c("Pathoge
 unique(rs$Clinical.Significance)
 
 
-rs= read.table("Variantes_MEF2C.txt", sep = "\t")
+rs= read.table("Variantes_MEF2C.txt", sep = "\t", stringsAsFactors = TRUE)
 rs$predominant_pop= apply(rs[, c(8:15)], 1, function(x)names(x)[which.max(x)])
 tab= rs[rs$phenotypes == "Intellectual Disability",c(1,3,5,6,19:20,22)]
 tab= tab[grep("Pathogenic|Likely pathogenic|Uncertain significance", tab$Clinical.Significance),]
@@ -60,6 +64,8 @@ unique(rs$Clinical.Significance)
 tab2= rs[,c(1,3,5,6,19:20,22,23)]
 write.table(tab2, "Variantes_MEF2C_tab.txt", quote= FALSE, sep= "\t", col.names = T )
 tab= read.delim2("Variantes_MEF2C_tab.txt", sep = "\t")
+
+glimpse(rs)
 
 frequencias <- table(rs$phenotypes)
 frequencias_df <- data.frame(Phenotypes = names(frequencias), Freq = as.vector(frequencias))
@@ -100,7 +106,8 @@ ancestralidade= ancestralidade %>% rename( Variante= Variation.ID, AFR = AFR.Fre
        OTH = OTH.Frequency,
        SAS = SAS.Frequency, 
        Clinical_snp= Clinical.Significance, 
-       Phenotypes = phenotypes)
+       Phenotypes = phenotypes) %>% 
+  mutate(Doença = if_else(Phenotypes == "Intellectual Disability", as.factor("YES"), as.factor("NO")))
 ancestralidade$freq_predominante= apply(ancestralidade[,-1], 1, function(x)names(x)[which.max(x)])
 
 library(tidyr) # Para a função gather()
@@ -118,8 +125,10 @@ ggplot(variantes_populacao_long, aes(x = Variante, y = Frequência, fill = Popul
 #nao usar
 rm(variantes_populacao_long)
 
-#só comas as 9variantes
-ancestralidadeDI=  rs[, c(1,8:15,20,22)] %>% rename( Variante= Variation.ID, AFR = AFR.Frequency,
+#só comas as 5 variantes
+ancestralidadeDI=  novo_rs2[, c(1,5:12, 14,15)] 
+ancestralidadeDI= merge(ancestralidadeDI, snps_communs, by= "Variation.ID", all=FALSE)
+ancestralidadeDI= ancestralidadeDI[,c(1:9,11,27)]%>% rename( Variante= Variation.ID, AFR = AFR.Frequency,
                                            AMR = AMR.Frequency,
                                            ASJ = ASJ.Frequency,
                                            EAS = EAS.Frequency,
@@ -129,10 +138,10 @@ ancestralidadeDI=  rs[, c(1,8:15,20,22)] %>% rename( Variante= Variation.ID, AFR
                                            SAS = SAS.Frequency, 
                                            Clinical_snp= Clinical.Significance,
                                            Phenotypes = phenotypes) 
-ancestralidadeDI$freq_predominante= apply(ancestralidade[,-1], 1, function(x)names(x)[which.max(x)])
+ancestralidadeDI$freq_predominante= apply(ancestralidadeDI[,-1], 1, function(x)names(x)[which.max(x)])
 ancestralidadeDI= ancestralidadeDI[ancestralidadeDI$Phenotypes == "Intellectual Disability", ] 
 ancestralidadeDI= ancestralidadeDI[ancestralidadeDI$Clinical_snp == "Uncertain significance" | ancestralidadeDI$Clinical_snp == "Pathogenic", ]
-#ancestralidadeVAR= ancestralidadeDI[ancestralidadeDI$Clinical_snp == "Uncertain significance" | ancestralidadeDI$Clinical_snp == "Pathogenic", ]
+ancestralidadeDI$Clinical_snp <- factor(ancestralidadeDI$Clinical_snp, levels = c("Pathogenic", "Likely pathogenic", "Uncertain significance","Likely benign", "Benign", "Conflicting interpretations of pathogenicity"))
 
 
 ggplot(ancestralidadeDI, aes(x = Variante, y = freq_predominante, fill = freq_predominante)) +
@@ -145,11 +154,15 @@ ggplot(ancestralidadeDI, aes(x = Variante, y = freq_predominante, fill = freq_pr
   theme(axis.text.x = element_text(angle = 35, hjust = 1))
 
 #separar de 20 a 20 variantes
+unique(ancestralidade$Phenotypes)
+cores= c("Pathogenic"="red3", "Likely benign"= "steelblue","Benign"=  "green2","Uncertain significance"="purple1", "Conflicting interpretations of pathogenicity"= "orange2","Likely pathogenic"= "pink1",
+         "Intellectual Disability"= "red", "not specified,not provided"= "blue", "History of neurodevelopmental disorder"= "green")
 ancestralidade1= ancestralidade[1:20,]
 ggplot(ancestralidade1, aes(x = Variante, y = freq_predominante, fill = Clinical_snp)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_jitter(aes(x = Variante, y = " ", color = Phenotypes, shape = Phenotypes), position = position_jitter(width = 0.3), size= 2) +
-  scale_color_manual(values = c("red", "blue", "green", "purple", "orange")) +
+  scale_fill_manual(values = cores) +
+  scale_color_manual(values = cores) +
   labs(fill = "Clinical Significance",
        x = "Variants", y = "Frequencies") +
   theme_minimal() +
@@ -159,7 +172,8 @@ ancestralidade2= ancestralidade[21:40,]
 ggplot(ancestralidade2, aes(x = Variante, y = freq_predominante, fill = Clinical_snp)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_jitter(aes(x = Variante, y = " ", color = Phenotypes, shape = Phenotypes), position = position_jitter(width = 0.4), size= 2) +
-  scale_color_manual(values = c("red", "blue", "green", "purple", "orange")) +
+  scale_fill_manual(values = cores) +
+  scale_color_manual(values = cores) +
   labs(fill = "Clinical Significance",
        x = "Variants", y = "Frequencies") +
   theme_minimal() +
@@ -169,14 +183,22 @@ ancestralidade3= ancestralidade[41:61,]
 ggplot(ancestralidade3, aes(x = Variante, y = freq_predominante, fill = Clinical_snp)) +
   geom_bar(stat = "identity", position = "dodge") +
   geom_jitter(aes(x = Variante, y = " ", color = Phenotypes, shape = Phenotypes), position = position_jitter(width = 0.3), size= 2) +
-  scale_color_manual(values = c("red", "blue", "green", "purple", "orange")) +
+  scale_fill_manual(values = cores) +
+  scale_color_manual(values = cores) +
   labs(fill = "Clinical Significance",
        x = "Variants", y = "Frequencies") +
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
 
-############
-#risco poligenico e testes estatisticos
+#################
+#associação com o gwas
+gwas= read.csv("gwas_mef2c.txt", sep = "\t")
+vcf=read.delim2("MEFE_AllFRQ.frq", sep = "\t")
+common_snps <- intersect(gwas$Position, vcf$Position)
+association= merge(gwas, vcf, by= "Position", all= FALSE)
+common_snps <- intersect(association$Variation.ID, clinvar$Variation.ID)
+
+# testes estatisticos
 #
 frequencias <- table(rs$phenotypes)
 frequencias_df <- data.frame(Phenotypes = names(frequencias), Freq = as.vector(frequencias))
@@ -202,9 +224,8 @@ kruskal_test_result1 <- kruskal.test(Frequencia ~ Populacao, data = dados_longos
 
 ggplot(dados_longos1, aes(x = Populacao, y = Frequencia, fill = Populacao)) +
   geom_bar(stat = "identity") +
-  labs(title = "Distribuição das Frequências por População",
-       x = "População",
-       y = "Frequência") +
+  labs(x = "Population",
+       y = "Frequency") +
   theme_minimal()
 
 freq_clinico=xtabs(~Clinical_snp+freq_predominante, ancestralidade)
@@ -213,10 +234,10 @@ resultados_testeFisher = fisher.test(freq_clinico)
 
 barplot(freq_clinico, col = 2:6, beside = TRUE, legend.text = TRUE,
         main = "",
-        xlab = "Frequência Predominante", ylab = "Frequência",
+        xlab = "Frequency Predominante", ylab = "Frequency",
         args.legend = list(x = "topright", y = max(freq_clinico) + 100, bty = "n", cex = 0.5))
        
-###teste t para ver se havia diferença significativa entre as populações entre as 9 variantes
+###teste t para ver se havia diferença significativa entre as populações entre as 5 variantes
 dados_test= ancestralidadeDI[,1:9]
 str(dados_test)
 dados_test[,-1] <- apply(dados_test[,-1], 2, as.numeric)
@@ -250,10 +271,10 @@ ggplot(resultados_df, aes(x = Variante, y = -log10(P_value), fill = Significativ
   theme_minimal() +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 
-##anova 
+ 
 library(tidyr)
 library()
-# Transforme o dataframe em um formato adequado
+
 dados_longos <- reshape2::melt(dados_test, id.vars = "Variante", variable.name = "Populacao", value.name = "Frequencia")
 dados_longos$Frequencia <- as.numeric(dados_longos$Frequencia)
 dados_longos$Frequencia <- dados_longos$Frequencia * 100
@@ -261,16 +282,15 @@ shapiro.test(dados_longos$Frequencia) #anormal
 
 #kruskalis-test
 kruskal_test_result <- kruskal.test(Frequencia ~ Populacao, data = dados_longos)
-#Há uma diferença significativa entre as populações
+#Não há uma diferença significativa entre as populações
 
 ggplot(dados_longos, aes(x = Populacao, y = Frequencia, fill = Populacao)) +
   geom_bar(stat = "identity") +
-  labs(title = "Distribuição das Frequências por População",
-       x = "População",
-       y = "Frequência") +
+  labs(x = "Population",
+       y = "Frequency") +
   theme_minimal()
 
-#regressão: analisar a relação entre as frequências das variantes em diferentes populações e algum resultado binário, como a presença ou ausência de uma doença
+##regressão: analisar a relação entre as frequências das variantes em diferentes populações e algum resultado binário, como a presença ou ausência de uma doença
 dado=as.data.frame(t(ancestralidade[,(1:9)]))
 colnames(dado) <- as.character(unlist(dado[1, ]))                     
 dado= dado[-1,]
@@ -282,55 +302,118 @@ dado <- dado[, c("população", names(dado)[-which(names(dado) == "população")
 write.table(dado, "populaçao_frequenciasbyvariantes.txt", sep = "\t", quote = FALSE)
 dados2= read.delim("populaçao_frequenciasbyvariantes.txt", sep = "\t")
 
+############3
+#regressçao logistica binomial
+library(dplyr)
+table(ancestralidade$Clinical_snp)
+summary(ancestralidade)
+glimpse(dadosAFR)
+levels(ancestralidade$Doença)
+dadosAFR= ancestralidade [, c(1,2,10,12)]
+modAFR= glm(Doença ~AFR+ clinical_snp, data= dadosAFR,
+            family = binomial(link = "logit"))
+plot(modAFR)
 
 
 #PCA; visualizar a estrutura genética das populações com base nas frequências das variantes.
 library(readr)
-dados=as.data.frame(t(ancestralidadeDI[,(1:9)]))
-colnames(dados) <- as.character(unlist(dados[1, ]))                     
-dados= dados[-1,]
+snp_data= ancestralidadeDI[,c(1:9)]
+snp_data[,2:8]= apply(dados_test[,2:8], 2, as.numeric)
+snp_data <- snp_data %>%
+  rowwise() %>%
+  mutate(Population_Predominant = colnames(snp_data[,-1])[which.max(c_across(c("AFR", "AMR", "ASJ", "NFE")))])
 
-dados$população= c("AFR", "AMR", "ASJ", "EAS", "FIN", "NFE", "OTH", "SAS" )
-dados <- data.frame(dados, row.names = NULL)
-dados <- dados[, c("população", names(dados)[-which(names(dados) == "população")])]
-dados_pca <- dados
+#matriz de frequências
+freq_matrix <- as.matrix(snp_data[ , 2:8])
 
-str(dados_pca)
-dados_pca[,-1] <- lapply(dados_pca[,-1], as.numeric)
-dados_pca[,-1] <- lapply(dados_pca[,-1], function(x) x * 100)
+pca_result <- prcomp(freq_matrix, scale = FALSE)
 
-pca_result <- prcomp(dados_pca[,-1], center = TRUE, scale. = TRUE)
+pca_coords <- as.data.frame(pca_result$x)
 
-# Criar um dataframe com os scores dos primeiros dois componentes principais
-pca_data <- data.frame(pca_result$x[, 1:2], Populacao = dados$população)
+#add um cluster
+kmeans_result <- kmeans(pca_coords[, c("PC1", "PC2")], centers = length(unique(pca_coords$Population_Predominant)))
 
-#add o data frame das variantes
-variantes <- as.data.frame(ancestralidadeDI[,1:9 ], row.names = NULL)
-novalinha= c("","AFR", "AMR", "ASJ", "EAS", "FIN", "NFE", "OTH", "SAS" )
-variantes = rbind(novalinha, variantes)
+# Adicionar os SNPs às coordenadas
+pca_coords$SNP <- snp_data$Variante
+pca_coords$Population_Predominant <- snp_data$Population_Predominant
+pca_coords$Cluster <- factor(kmeans_result$cluster)
 
-variantes[2:nrow(variantes), -1] <- lapply(variantes[2:nrow(variantes), -1], as.numeric)
-variantes[2:nrow(variantes), -1] <- lapply(variantes[2:nrow(variantes), -1], function(x) x * 100)
-
-
-variantes[,-1] <- lapply(variantes[,-1], as.numeric)
-variantes[,-1] <- lapply(variantes[,-1], function(x) x * 100)
-str(variantes)
-
-# Calcular PCA para as variantes também
-variantes_pca <- prcomp(variantes[c(2:10), -1], center = TRUE, scale. = TRUE)
-
-variantes_data <- data.frame(variantes_pca$x[, 1:2], Variante = variantes[-1,1])
-
-#plotar
-ggplot() +
-  # Plotar os pontos das populações
-  geom_point(data = pca_data, aes(x = PC1, y = PC2, color = Populacao), size = 3) +
-  # Adicionar os pontos das variantes
-  geom_text(data = variantes_data, aes(x = PC1, y = PC2, label = Variante), vjust = 1, hjust = -0.5, size = 3.5) +
-  # Personalizar o gráfico
-  labs(title = "PCA das Populações e Variantes",
-       x = "Componente Principal 1",
-       y = "Componente Principal 2") +
+# Plotar O PCA
+ggplot(pca_coords, aes(x = PC1, y = PC2, label = SNP)) +
+  geom_point(aes(color=Cluster, size=2 )) +
+  geom_text(aes(label = SNP), hjust = 1.5, vjust = 1.5) +
   theme_minimal() +
-  theme(legend.position = "bottom")
+  labs(title = "PCA dos SNPs", x = "Componente Principal 1", y = "Componente Principal 2")+
+  scale_color_brewer(palette = "Set1")
+
+freq_scale= scale(freq_matrix)
+
+corr_matrix <- cor(freq_scale)
+ggcorrplot(corr_matrix,hc.order = TRUE, type = "lower",
+           lab = TRUE)
+
+install.packages("ggcorrplot")
+library(ggcorrplot)
+
+#fst
+install.packages("hierfstat")
+install.packages("adegenet")
+library(hierfstat)
+library(adegenet)
+
+data= ancestralidadeDI[,1:9]
+freq_data= data[ ,-1]
+
+calculate_fst <- function(freq_data) {
+  fst_values <- numeric(nrow(freq_data))
+  
+  for (i in 1:nrow(freq_data)) {
+    freqs <- as.numeric(freq_data[i, ])
+    
+    # Média das frequências alélicas entre populações
+    p_bar <- mean(freqs)
+    
+    # Heterozigosidade esperada dentro das populações (HS)
+    hs <- mean(2 * freqs * (1 - freqs))
+    
+    # Heterozigosidade esperada total (HT)
+    ht <- 2 * p_bar * (1 - p_bar)
+    
+    # FST
+    if (ht != 0) {
+      fst_values[i] <- (ht - hs) / ht
+    } else {
+      fst_values[i] <- 0
+    }
+  }
+  
+  return(fst_values)
+}
+
+# Calcular FST
+data$FST <- calculate_fst(freq_data)
+print(data)
+#apresenta alta diferenciação genetica entre as populações
+
+data_long <- reshape2::melt(data, id.vars = "Variante")
+colnames(data_long) <- c("Variante", "Populacao", "Frequencia")
+data_long$Frequencia= as.numeric(data_long$Frequencia)
+
+ggplot(data_long, aes(x = Variante, y = Frequencia, fill = Populacao)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  geom_text(aes(label = round(Frequencia, 2)), vjust = -0.3, position = position_dodge(0.9), size = 3.5) +
+  labs(title = "Frequências Alélicas por Variante e População",
+       x = "Variante",
+       y = "Frequência Alélica") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+ggplot(data, aes(x = Variante, y = FST, fill = Variante)) +
+  geom_bar(stat = "identity") +
+  geom_text(aes(label = round(FST, 2)), vjust = -0.3, size = 3.5) +
+  labs(title = "Valores de FST por Variante",
+       x = "Variante",
+       y = "FST") +
+  theme_minimal()+
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
