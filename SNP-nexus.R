@@ -14,6 +14,8 @@ rm()
 
 rs= merge(gnomad, clinvar, by= "Variation.ID", all= F)
 rs$phenotypes= NA
+write.table(rs, "Variantes_MEF2C.txt", sep = "\t", col.names = T, quote = FALSE)
+rss= read.table("Variantes_MEF2C.txt", sep = "\t")
 
 #1filtro: por phenotypo: DI
 rs.DI= rs[grep("Mental retardation|Intellectual Disability", rs$Phenotypes),c(1:15,19:22)]
@@ -98,6 +100,10 @@ pie(porcentagem1, labels = paste(names(porcentagem1), "(", porcentagem1, "%)", s
 
 pheno= data.frame(tabela1, porcentagem1)
 unique(rs$Phenotypes)
+
+
+
+
 ## frequencias
 data= rs[,c(1,8:15)]
 data$AFR.Frequency= as.numeric(data$AFR.Frequency)
